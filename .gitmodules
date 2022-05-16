@@ -1,0 +1,3 @@
+[submodule "courses/threejs"]
+	path = courses/threejs
+	url = git@github.com:johnkegd/threejs.git
