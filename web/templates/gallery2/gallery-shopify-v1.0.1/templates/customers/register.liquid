@@ -1,0 +1,66 @@
+<div class="section container">
+  <div class="row">
+    <div class="col s12 m6 offset-m3">
+      <div class="card login-wrapper">
+        <div class="card-content">
+
+          {% form 'create_customer' %}
+            <h4 class="center">{{ 'customer.register.title' | t }}</h4>
+
+            {{ form.errors | default_errors }}
+
+            <div class="input-field">
+              <label for="FirstName">
+                {{ 'customer.register.first_name' | t }}
+              </label>
+              <input type="text"
+                name="customer[first_name]"
+                id="FirstName"
+                autofocus
+                {% if form.first_name %}value="{{ form.first_name }}"{% endif %}>
+            </div>
+
+            <div class="input-field">
+              <label for="LastName">
+                {{ 'customer.register.last_name' | t }}
+              </label>
+              <input type="text"
+                name="customer[last_name]"
+                id="LastName"
+                {% if form.last_name %}value="{{ form.last_name }}"{% endif %}>
+            </div>
+
+            <div class="input-field">
+              <label for="Email">
+                {{ 'customer.register.email' | t }}
+              </label>
+              <input type="email"
+                name="customer[email]"
+                id="Email"
+                class="{% if form.errors contains 'email' %}input-error{% endif %}"
+                value="{% if form.email %}{{ form.email }}{% endif %}"
+                spellcheck="false"
+                autocomplete="off"
+                autocapitalize="off">
+            </div>
+
+            <div class="input-field">
+              <label for="CreatePassword">
+                {{ 'customer.register.password' | t }}
+              </label>
+              <input type="password"
+                name="customer[password]"
+                id="CreatePassword"
+                class="{% if form.errors contains 'password' %}input-error{% endif %}">
+            </div>
+
+            <p>
+              <input type="submit" value="{{ 'customer.register.submit' | t }}" class="btn-large z-depth-0">
+            </p>
+          {% endform %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

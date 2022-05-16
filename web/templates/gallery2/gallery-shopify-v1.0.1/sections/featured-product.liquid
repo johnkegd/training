@@ -1,0 +1,85 @@
+{%- assign product = all_products[section.settings.product] -%}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+{% if product.empty? %}
+  {%- assign section_onboarding = true -%}
+  {%- assign onboarding_title = 'homepage.onboarding.product_title' | t -%}
+{% endif %}
+
+<div class="
+    featured-product-wrapper
+    {% if settings.dark_theme == false %} container {% endif %}
+    {% if section.settings.right_aligned %} right-aligned {% endif %}"
+  data-section-id="{{ section.id }}" data-section-type="product" itemscope itemtype="http://schema.org/Product">
+  <div class="gallery row">
+    <div class="col s12 m6">
+      <div class="product-description">
+        <meta itemprop="name" content="{{ product.title }}">
+        <meta itemprop="url" content="{{ shop.url }}{{ product.url }}">
+        <meta itemprop="image" content="{{ product.featured_image.src | img_url: '800x' }}">
+        <meta itemprop="description" content="{{ product.description | strip_html | escape }}">
+
+        <h2>{{ product.title | default: onboarding_title }}</h2>
+
+        {% if section.settings.show_share_buttons %}
+          {% include 'social-sharing', share_title: product.title, share_permalink: product.url, share_image: product %}
+        {% endif %}
+
+        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+          <meta itemprop="price" content="{{ product.price | divided_by: 100.00 }}">
+          <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+        </div>
+        <div class="rte">
+          {{ product.description }}
+        </div>
+      </div>
+    </div>
+
+    {% assign product_col = "m6" %}
+    {% assign product_fillscreen = true %}
+    {% assign product_responsive = true %}
+    {% assign current_variant = product.selected_or_first_available_variant %}
+    {% include 'product-expand' %}
+  </div>
+</div>
+
+
+
+
+{% unless product.empty? %}
+  <script type="application/json" data-product-json>
+    {{ product | json }}
+  </script>
+{% endunless %}
+
+
+{% schema %}
+  {
+    "name": "Featured product",
+    "settings": [
+      {
+        "type": "product",
+        "id": "product",
+        "label": "Product"
+      },
+      {
+        "type": "checkbox",
+        "id": "right_aligned",
+        "label": "Right aligned",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "show_share_buttons",
+        "label": "Show social sharing buttons"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Featured product",
+        "category": "Product"
+      }
+    ]
+  }
+{% endschema %}

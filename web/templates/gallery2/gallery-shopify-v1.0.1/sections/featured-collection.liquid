@@ -1,0 +1,59 @@
+{%- assign collection = collections[section.settings.collection] -%}
+
+{% assign pagination_limit = 6 %}
+{% if settings.dark_theme %}
+  {% assign product_col = "m4 l3" %}
+  {% assign pagination_limit = 12 %}
+{% endif %}
+
+<div class="featured-collection-wrapper {% if settings.dark_theme == false %} container {% endif %}">
+  <div class="{% if settings.dark_theme %} container {% endif %}">
+    {% if section.settings.title != blank %}
+      <h2 class="collection-title">{{ section.settings.title | escape }}</h2>
+    {% endif %}
+
+    <div class="rte">
+      {{ collection.description }}
+    </div>
+  </div>
+
+  <div class="gallery gallery-masonry row">
+    {% for product in collection.products limit: pagination_limit %}
+      {%- assign current_variant = product.selected_or_first_available_variant -%}
+      {% include 'product-expand' %}
+    {% endfor %}
+  </div>
+
+  {% if collection.products.size > pagination_limit %}
+    <div class="center">
+      <a href="{{ collection.url }}" title="See all of the {{collection.title}} collection" class="btn-large">See all</a>
+    </div>
+  {% endif %}
+</div>
+
+
+{% schema %}
+  {
+    "name": "Featured collection",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Featured collection"
+      },
+      {
+        "id": "collection",
+        "type": "collection",
+        "label": "Collection"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Featured collection",
+        "category": "Collection"
+      }
+    ]
+  }
+
+{% endschema %}

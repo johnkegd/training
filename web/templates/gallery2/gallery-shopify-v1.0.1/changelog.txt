@@ -1,0 +1,7 @@
+## v1.0.1 (Jan 4th, 2018)
+- GalleryExpand
+  - Fixed bug where changing hash would cause modal to close
+
+- Product
+  - Fixed bugs where pagination would cause products to be unloaded
+  - Product now registers changes for variants

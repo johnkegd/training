@@ -1,0 +1,98 @@
+{%- assign nav_full_header = false -%}
+{% if section.settings.header_full_header or template == 'page.full-header' %}
+  {%- assign nav_full_header = true -%}
+{% elsif template contains 'collection' and settings.collection_full_header %}
+  {%- assign nav_full_header = true -%}
+{% endif %}
+
+{%- assign types = collection.all_types -%}
+{%- assign tags = collection.tags -%}
+
+{%- assign variants = '' -%}
+{%- assign variants_with_options = collection.products | map: 'options_with_values' -%}
+{% for each_variants in variants_with_options  %}
+  {% for variant in each_variants  %}
+    {%- assign variant_name = variant.name | handleize -%}
+    {%- assign unique_variant_name = '"' | append: variant_name | append: '"' -%}
+    {% unless variant_name == 'title' or variants contains unique_variant_name %}
+      {% capture variant_string -%}"{{variant.name | handleize}}":{% for value in variant.values %}{{value | handleize}}{% if forloop.last != true %},{% endif %}{% endfor %}{% endcapture %}
+      {% if variants != '' %}
+        {%- assign variants = variants | append: '|' | append: variant_string -%}
+      {% else %}
+        {%- assign variants = variants | append: variant_string -%}
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+{% endfor %}
+{%- assign variants = variants | split: '|' -%}
+{% comment %}{%- assign variants = variants | map: 'title' | uniq -%}{% endcomment %}
+
+{%- assign filter_navbar_added = true -%}
+
+{%- assign count = 0 -%}
+{% if types.size > 1 and settings.filter_type == false %}
+  {% assign count = count | plus: 1 %}
+{% endif %}
+{% if tags.size > 1 and settings.filter_tag == false %}
+  {% assign count = count | plus: 1 %}
+{% endif %}
+{% if variants.size > 1 and settings.filter_variant == false %}
+  {% assign count = count | plus: 1 %}
+{% endif %}
+{% assign nav_height = 48 | times: count %}
+
+<nav
+  style="height: {{nav_height}}px; {% if settings.dark_theme or nav_full_header %} margin-top: -{{nav_height}}px; background: transparent; {% endif %}"
+  class="filter-navbar {% if settings.dark_theme %} z-depth-0 {% endif %}">
+  <div class="categories-wrapper">
+    <div class="categories-container">
+      {% if types.size > 1 and settings.filter_type == false %}
+        <ul class="categories container" data-filter="type">
+          <li class="active"><a href="#all">All</a></li>
+          {% for product_type in types %}
+            {% if product_type != blank %}
+              <li><a href="#{{ product_type | handleize }}">{{ product_type }}</a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {% if tags.size > 1 and settings.filter_tag == false %}
+        <ul class="categories container" data-filter="tag">
+          <li class="active"><a href="#all">All</a></li>
+          {% for tag in tags %}
+            {% if tag != blank %}
+              <li><a href="#{{ tag | handleize }}">{{ tag }}</a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {% if variants.size > 1 and settings.filter_variant == false %}
+        <ul class="categories container" data-filter="variant">
+          {% for variant in variants %}
+            {% assign variant_obj = variant | split: ':' %}
+            {% assign variant_type = variant_obj[0] %}
+            {% assign length = variant_type | size | minus: 2 %}
+            {% assign variant_type = variant_type | slice: 1, length %}
+            {% assign options = variant_obj[1] | split: ',' %}
+            <li>
+              <select name="{{variant_type}}">
+                <option selected value="all">{{variant_type}}</option>
+                {% for option in options %}
+                  <option value="{{option}}">{{option}}</option>
+                {% endfor %}
+              </select>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+{% if settings.dark_theme %}
+  <style>
+    .gallery-dark-theme nav.nav-extended {
+      padding-bottom: {{nav_height}}px;
+    }
+  </style>
+{% endif %}

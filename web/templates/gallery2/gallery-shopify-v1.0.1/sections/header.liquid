@@ -1,0 +1,398 @@
+{%- assign nav_full_header = false -%}
+{% if section.settings.header_full_header or template == 'page.full-header' %}
+  {%- assign nav_full_header = true -%}
+{% elsif template contains 'collection' and settings.collection_full_header %}
+  {%- assign nav_full_header = true -%}
+{% endif %}
+
+{%- assign nav_carousel = false -%}
+{% if section.blocks.size > 0 %}
+  {% if section.settings.header_carousel_homepage %}
+    {% if template == 'index' %}
+      {%- assign nav_carousel = true -%}
+    {% endif %}
+  {% else %}
+    {%- assign nav_carousel = true -%}
+  {% endif %}
+{% endif %}
+
+<style>
+  {% if section.settings.logo != blank %}
+    .site-header__logo-image {
+      max-width: {{ section.settings.logo_max_width }}px;
+    }
+  {% endif %}
+
+  {% if section.settings.align_logo == 'left' %}
+    .site-header__logo-image {
+      margin: 0;
+    }
+  {% endif %}
+
+  {% if nav_full_header %}
+    #shopify-section-header {
+      height: 100%;
+    }
+  {% endif %}
+</style>
+
+<!-- Navbar and Header -->
+
+<nav
+  class="nav-extended
+         {% if nav_full_header %} nav-full-header {% endif %}
+         {% if settings.dark_theme %} z-depth-0 {% endif %}">
+
+  {% if nav_carousel %}
+    <div class="nav-background">
+      {% for block in section.blocks %}
+        <img {% if forloop.first == true %} class="active" {% endif %}
+          src="{{block.settings.header_slide_image | img_url: "master"}}">
+      {% endfor %}
+    </div>
+  {% elsif template contains 'collection' and collection.image %}
+    <div class="nav-background">
+      <div class="pattern active" style="background-image: url('{{ collection.image | img_url: "master" }}');"></div>
+    </div>
+  {% elsif section.settings.background != blank %}
+    <div class="nav-background">
+      <div class="pattern active" style="background-image: url('{{ section.settings.background | img_url: "master" }}');"></div>
+    </div>
+  {% endif %}
+
+  <div class="nav-wrapper container">
+    <a href="/" itemprop="url" class="brand-logo site-logo{% if section.settings.logo != blank %} site-header__logo-image{% endif %}">
+      {% if section.settings.logo != blank %}
+        {% capture image_size %}{{ section.settings.logo_max_width }}x{% endcapture %}
+        <img src="{{ section.settings.logo | img_url: image_size }}"
+             srcset="{{ section.settings.logo | img_url: image_size }} 1x, {{ section.settings.logo | img_url: image_size, scale: 2 }} 2x"
+             alt="{{ section.settings.logo.alt | default: shop.name }}"
+             itemprop="logo">
+      {% else %}
+        {{ settings.shop_title }}
+      {% endif %}
+    </a>
+
+    {% comment %}<a href="index.html" class="brand-logo">
+    </a>{% endcomment %}
+    <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+    <ul class="right hide-on-med-and-down">
+
+      {% for link in linklists[section.settings.main_linklist].links %}
+        {%- assign child_list_handle = link.title | handleize -%}
+        {% if menus[child_list_handle].links != blank %}
+          <li class="site-nav--has-submenu{% if link.active %} site-nav--active active{% endif %}">
+            <a href="{{ link.url }}"
+               class="site-nav__link dropdown-button"
+               data-activates="{{child_list_handle}}-dropdown"
+               data-belowOrigin="true"
+               data-constrainWidth="false"
+               data-hover="true">
+              {{ link.title }}
+              <i class="material-icons right">arrow_drop_down</i>
+            </a>
+            <ul id="{{child_list_handle}}-dropdown" class="site-nav__submenu dropdown-content">
+              {% for childlink in menus[child_list_handle].links %}
+                <li {% if childlink.active %}class="site-nav--active"{% endif %}>
+                  <a href="{{ childlink.url }}" class="site-nav__link">{{ childlink.title | escape }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </li>
+        {% else %}
+          <li {% if link.active %}class="site-nav--active active"{% endif %}>
+            <a href="{{ link.url }}" class="site-nav__link">{{ link.title }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      <li>
+        <a href="/cart">
+          <i class="material-icons left">shopping_cart</i>
+          {{ 'layout.cart.title' | t }}
+          {% if cart.item_count > 0 %}
+            <span class="badge new" data-badge-caption="">{{ cart.item_count }} {{ 'layout.cart.items_count' | t: count: cart.item_count }}</span>
+          {% endif %}
+        </a>
+      </li>
+      <li>
+        <a class="fullscreen-search" href="#">
+          <i class="material-icons">search</i>
+        </a>
+      </li>
+      {% if shop.customer_accounts_enabled %}
+        {% if customer %}
+          <li>
+            <a href="/account"
+               class="user-account dropdown-button"
+               data-activates="user-account-dropdown"
+               data-belowOrigin="true"
+               data-constrainWidth="false"
+               data-hover="true">
+              {% if customer.email %}
+                <img class="circle" src="https://www.gravatar.com/avatar/{{ customer.email | remove: ' ' | strip_newlines | downcase | md5 }}" />
+              {% endif %}
+
+              {% if customer.first_name != blank %}
+                {{ customer.first_name }}
+              {% else %}
+                {{ 'layout.customer.account' | t }}
+              {% endif %}
+              <i class="material-icons right">arrow_drop_down</i>
+            </a>
+            <ul id="user-account-dropdown" class="dropdown-content">
+              <li><a href="/account/addresses">Addresses</a></li>
+              <li><a href="/account/logout">Log Out</a></li>
+            </ul>
+          </li>
+        {% else %}
+          <li>
+            {{ 'layout.customer.log_in' | t | customer_login_link }}
+          </li>
+          <li>
+            {{ 'layout.customer.create_account' | t | customer_register_link }}
+          </li>
+        {% endif %}
+      {% endif %}
+
+    </ul>
+  </div>
+  {% if nav_full_header %}
+  <div class="nav-header valign-wrapper">
+  {% else %}
+  <div class="nav-header center">
+  {% endif %}
+
+    <!-- Show Carousel instead of default page titles -->
+    {% if nav_carousel %}
+      <div class="carousel carousel-slider center" data-indicators="true">
+        {% for block in section.blocks %}
+          <div class="carousel-item white-text">
+            <div class="container valign-wrapper">
+              <h1>{{ block.settings.header_slide_text }}</h1>
+              <div class="tagline">{{ block.settings.header_slide_tagline }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+    <!-- Static Page Titles -->
+    {% else %}
+      {% assign title = page_title %}
+      {% assign tagline = page_description %}
+
+      {% if template == 'index' %}
+        {% assign title = settings.homepage_title %}
+        {% assign tagline = settings.homepage_tagline %}
+      {% elsif template contains 'collection' %}
+        {% if current_tags.size %}
+          {% assign tagline = current_tags | join: ', ' %}
+        {% else %}
+          {% assign tagline = 'Collection' %}
+        {% endif %}
+      {% elsif template == 'product' %}
+        {% assign tagline = 'Product' %}
+      {% elsif template == 'cart' %}
+        {% assign title = 'Shopping Cart' %}
+        {% capture tagline %}Subtotal: {{ cart.total_price | money }}{% endcapture %}
+      {% elsif template == 'search' %}
+        {% capture tagline %}{{ search.results_count }} {% if search.results_count == 1 %} search result {% else %} search results {% endif %}{% endcapture %}
+      {% elsif template == 'customers/login' or template == 'customers/register' %}
+        {% assign title = 'Customer' %}
+        {% assign tagline = 'authentication' %}
+      {% elsif template contains 'customers/' %}
+        {% if template == 'customers/account' %}
+          {% assign title = 'My Account' %}
+        {% elsif template == 'customers/addresses' %}
+          {% assign title = 'My Addresses' %}
+        {% elsif template == 'customers/order' %}
+          {% assign title = 'customer.order.title' | t: name: order.name %}
+        {% endif %}
+        {% assign tagline = 'Customer' %}
+      {% elsif template contains 'blog' %}
+        {% assign tagline = 'blog' %}
+      {% elsif template contains 'article' %}
+        {% assign tagline = 'article' %}
+      {% elsif template == '404' %}
+        {% assign tagline = 'Page Not Found' %}
+      {% elsif template == 'page.contact' %}
+        {% assign tagline = 'Get In Touch' %}
+      {% elsif template contains 'page' %}
+        {% assign tagline = 'page' %}
+      {% endif %}
+
+      {% assign title_html = '<h1>' | append: title | append: '</h1>'  %}
+      {% assign tagline_html = '<div class="tagline">' | append: tagline | append: '</div>' %}
+
+      {{title_html}}
+      {{tagline_html}}
+    {% endif %}
+
+  </div>
+</nav>
+<ul class="side-nav" id="nav-mobile">
+
+  {% if shop.customer_accounts_enabled %}
+    {% if customer %}
+      <li>
+
+        <ul class="collapsible user-account-collapsible" data-collapsible="accordion">
+          <li>
+            <div class="collapsible-header">
+              <div class="userView">
+                <div class="background">
+                  <img src="images/office.jpg">
+                </div>
+                {% if customer.email %}
+                  <img class="circle" src="https://www.gravatar.com/avatar/{{ customer.email | remove: ' ' | strip_newlines | downcase | md5 }}" />
+                {% endif %}
+                {% if customer.name %}
+                  <span class="white-text name">{{customer.name}}</span>
+                {% endif %}
+                {% if customer.email %}
+                  <span class="white-text email">{{customer.email}}<i class="material-icons right">arrow_drop_down</i></span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="collapsible-body no-padding">
+              <ul>
+                <li><a href="/account">My Account</a></li>
+                <li><a href="/account/addresses">Addresses</a></li>
+                <li><a href="/account/logout">Log Out</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </li>
+    {% else %}
+      <li> {{ 'layout.customer.log_in' | t | customer_login_link }} </li>
+      <li> {{ 'layout.customer.create_account' | t | customer_register_link }} </li>
+    {% endif %}
+  {% endif %}
+
+  {% for link in linklists[section.settings.main_linklist].links %}
+    {%- assign child_list_handle = link.title | handleize -%}
+    {% if menus[child_list_handle].links != blank %}
+      <li class="site-nav--has-submenu{% if link.active %} site-nav--active active{% endif %}">
+        <ul class="collapsible" data-collapsible="accordion">
+          <li>
+            <div class="collapsible-header">{{ link.title }}<i class="material-icons right">arrow_drop_down</i></div>
+            <div class="collapsible-body no-padding">
+              <ul>
+                {% for childlink in menus[child_list_handle].links %}
+                  <li {% if childlink.active %}class="site-nav--active"{% endif %}>
+                    <a href="{{ childlink.url }}" class="site-nav__link">{{ childlink.title | escape }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </li>
+    {% else %}
+      <li {% if link.active %}class="site-nav--active active"{% endif %}>
+        <a href="{{ link.url }}" class="site-nav__link">{{ link.title }}</a>
+      </li>
+    {% endif %}
+  {% endfor %}
+
+  <li>
+    <a href="/cart">
+      {{ 'layout.cart.title' | t }}
+      {% if cart.item_count > 0 %}
+        <span class="badge new" data-badge-caption="">{{ cart.item_count }} {{ 'layout.cart.items_count' | t: count: cart.item_count }}</span>
+      {% endif %}
+    </a>
+  </li>
+
+  <li>
+    <a class="fullscreen-search" href="#">
+      Search
+    </a>
+  </li>
+</ul>
+
+<div data-section-id="{{ section.id }}" data-section-type="header-section">
+  <header role="banner">
+
+    <div class="popup-search-wrapper">
+      {% include 'search-form' %}
+
+      <i class="popup-close material-icons">close</i>
+    </div>
+
+  </header>
+</div>
+
+{% schema %}
+  {
+    "name": "Header",
+    "max_blocks": 6,
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo image"
+      },
+      {
+        "type": "image_picker",
+        "id": "background",
+        "label": "Background image"
+      },
+      {
+        "type": "text",
+        "id": "logo_max_width",
+        "label": "Custom logo width (in pixels)",
+        "default": "250"
+      },
+      {
+        "type": "link_list",
+        "id": "main_linklist",
+        "label": "Menu",
+        "default": "main-menu"
+      },
+      {
+        "type": "checkbox",
+        "id": "header_full_header",
+        "label": "Fullscreen header",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "header_carousel_homepage",
+        "label": "Show Carousel on Homepage only",
+        "default": false
+      }
+    ],
+    "blocks": [
+      {
+        "type": "slide",
+        "name": "Slide",
+        "settings": [
+          {
+            "label": "Slide Image",
+            "id": "header_slide_image",
+            "type": "image_picker"
+          },
+          {
+            "type": "text",
+            "id": "header_slide_text",
+            "label": "Header Carousel Slide Main Text",
+            "default": "Main Text"
+          },
+          {
+            "type": "text",
+            "id": "header_slide_tagline",
+            "label": "Header Carousel Slide Tagline",
+            "default": "Tagline"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Header"
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,175 @@
+<div class="cart-container container">
+{% if cart.item_count > 0 %}
+  <form action="/cart" method="post" novalidate>
+  <div class="row">
+    <div class="col s12 l8">
+      <div class="gallery gallery-collection row">
+        {% for item in cart.items %}
+
+          <div
+            class="col s12 gallery-item gallery-expand gallery-horizontal"
+            data-item-id="{{item.id}}">
+            <div class="placeholder">
+              <div class="gallery-curve-wrapper">
+                <a class="gallery-cover gray">
+                  <img class="hide" src="{{ item | img_url: 'master' }}" alt="{{ item.title | escape }}" crossorigin="anonymous">
+                  <div class="background" style="background-image: url('{{ item | img_url: 'master' }}')" alt="{{ item.title | escape }}"></div>
+                </a>
+                <div class="gallery-header" data-stop-propagation="true">
+                  <h4>{{ item.product.title }}</h4>
+
+                  <div class="price-quantity-wrapper">
+                    <div class="price-wrapper" data-price-wrapper>
+                      <label>price</label>
+                      <span class="price" data-product-price>
+                        {{ item.price | money }}
+                      </span>
+
+                      {% if item.product.compare_at_price_max > item.product.price %}
+                        <span class="visually-hidden" data-compare-text>{{ 'products.product.regular_price' | t }}</span>
+                        <s data-compare-price>
+                          {% if item.compare_at_price > item.price %}
+                            {{ item.compare_at_price | money }}
+                          {% endif %}
+                        </s>
+                      {% endif %}
+                    </div>
+
+                    <div class="input-field quantity-counter">
+                      <label for="updates_{{ item.key }}">quantity</label>
+                      <i class="material-icons remove">remove_circle_outline</i>
+                      <input type="number"
+                         name="updates[]"
+                         id="updates_{{ item.key }}"
+                         value="{{ item.quantity }}"
+                         min="0"
+                         aria-label="{{ 'cart.general.item_quantity' | t }}">
+                      <i class="material-icons add">add_circle_outline</i>
+                    </div>
+                  </div>
+
+                  <div class="variant-remove-item-wrapper">
+                    {% unless item.product.has_only_default_variant %}
+                      <div class="variant">
+                        <label>variant</label>
+                        <div>{{item.variant.title}}</div>
+                      </div>
+                    {% endunless %}
+
+                    <a class="btn remove-item-from-cart" href="/cart/change?line={{ forloop.index }}&amp;quantity=0" data-stop-propagation="true">
+                      <i class="material-icons">delete</i>
+                    </a>
+                  </div>
+                </div>
+                <div class="gallery-body">
+                  <div class="title-wrapper">
+                    <h3>Grapefruit</h3>
+                  </div>
+                  <div class="checkout-column">
+                    {% assign current_variant = item.product.selected_or_first_available_variant %}
+                    <form action="/cart/add" method="post" enctype="multipart/form-data">
+                      <div class="price-quantity-wrapper">
+                        <div class="price-wrapper" data-price-wrapper>
+                          <label>price</label>
+                          <span class="price" data-product-price>
+                            {{ item.price | money }}
+                          </span>
+
+                          {% if item.compare_at_price_max > item.price %}
+                            <span class="visually-hidden" data-compare-text>{{ 'products.product.regular_price' | t }}</span>
+                            <s data-compare-price>
+                              {% if current_variant.compare_at_price > current_variant.price %}
+                                {{ current_variant.compare_at_price | money }}
+                              {% endif %}
+                            </s>
+                          {% endif %}
+                        </div>
+
+                        <div class="quantity-counter">
+                          <label>quantity</label>
+                          <span>{{ item.quantity }}</span>
+                        </div>
+                      </div>
+
+                      {% assign variant_titles = item.variant.title | split: '/' %}
+                      {% unless item.product.variants.size == 1 and item.product.options.size == 1 and item.product.options.first == 'Title' and item.product.variants.first.title == 'Default Title' %}
+                        {% for option in item.product.options_with_values %}
+                          <div class="variant">
+                            <label {% if option.name == 'default' %}class="label-hidden"{% endif %}>{{ option.name }}</label>
+                            <span>{{ variant_titles[forloop.index0] }}</span>
+                          </div>
+                        {% endfor %}
+                      {% endunless %}
+
+
+
+
+                      {% if item.product.tags.size > 0 %}
+                        <div class="tags-wrapper">
+                          <label>tags</label>
+                          <div class="tags">
+                            {% for tag in item.product.tags %}
+                              <div class="chip">{{ tag | link_to_tag: tag }}</div>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      {% endif %}
+
+                    </form>
+                  </div>
+                  <p class="description">{{ item.product.description }}</p>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+        {% endfor %}
+
+        </div>
+
+    </div>
+    <div class="col s12 l4 cart-summary">
+      <h4>Summary</h4>
+      {% if settings.cart_notes_enable %}
+        <div class="input-field cart-notes">
+          <textarea class="materialize-textarea" name="note" id="CartSpecialInstructions">{{ cart.note }}</textarea>
+          <label for="CartSpecialInstructions">{{ 'cart.general.note' | t }}</label>
+        </div>
+      {% endif %}
+
+      <div class="subtotal">
+        <span>{{ 'cart.general.subtotal' | t }}</span>
+        <div class="price">{{ cart.total_price | money }}</div>
+      </div>
+      {% if cart.total_discounts > 0 %}
+        <p>{{ 'cart.general.savings' | t }} {{ cart.total_discounts | money }}</p>
+      {% endif %}
+      <p>{{ 'cart.general.shipping_at_checkout' | t }}</p>
+      <input type="submit" name="checkout" class="btn-large" value="{{ 'cart.general.checkout' | t }}">
+    </div>
+  </div>
+
+  </form>
+{% else %}
+  {% comment %}
+  Cart empty state
+  {% endcomment %}
+  <div class="empty-container">
+    <div class="supports-cookies center">
+      <h3>{{ 'cart.general.empty' | t }}</h3>
+      <a class="btn-large" href="collections/all">Continue Browsing</a>
+    </div>
+
+    {% comment %}
+    Cart no cookies state
+    ---------------------
+    Browser cookies are required to use the cart. If cookies aren't enabled in the
+    browser a message is displayed prompting the user to enable them.
+    {% endcomment %}
+    <div class="supports-no-cookies">
+      <p>{{ 'cart.general.cookies_required' | t }}</p>
+    </div>
+  </div>
+{% endif %}
+</div>

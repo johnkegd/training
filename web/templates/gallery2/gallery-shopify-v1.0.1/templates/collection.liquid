@@ -1,0 +1,17 @@
+{% assign pagination_limit = 6 %}
+{% if settings.dark_theme %}
+  {% assign product_col = "m4 l3" %}
+  {% assign pagination_limit = 12 %}
+{% endif %}
+{% if current_tags == blank %}
+  {% include 'filter-navbar' %}
+{% endif %}
+
+<div class="{% if settings.dark_theme == false %} container {% endif %}">
+  <div class="gallery gallery-masonry row">
+    {% for product in collection.products %}
+      {%- assign current_variant = product.selected_or_first_available_variant -%}
+      {% include 'product-expand' %}
+    {% endfor %}
+  </div>
+</div>

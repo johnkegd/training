@@ -1,0 +1,40 @@
+{% paginate search.results by 10 %}
+
+{% if settings.dark_theme %}
+  {% assign product_col = "m4 l3" %}
+{% endif %}
+
+<div class="{% if settings.dark_theme == false %} container {% endif %}">
+
+  {% if search.performed %}
+    <div class="gallery gallery-masonry row">
+      {% for item in search.results %}
+        {%- assign product = item -%}
+        {%- assign current_variant = product.selected_or_first_available_variant -%}
+        {% include 'product-expand' %}
+      {% endfor %}
+    </div>
+
+    {% if search.results.size == 0 %}
+      <div class="empty-container">
+        <div class="supports-cookies center">
+          <h3>{{ 'general.search.no_results_html' | t: terms: search.terms }}</h3>
+          <a class="btn-large" href="collections/all">Continue Browsing</a>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if paginate.pages > 1 %}
+      {% include 'pagination' %}
+    {% endif %}
+  {% else %}
+    <div class="empty-container">
+      <div class="supports-cookies center">
+        <h3>{{ 'general.search.no_results_html' | t: terms: search.terms }}</h3>
+        <a class="btn-large" href="collections/all">Continue Browsing</a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{% endpaginate %}

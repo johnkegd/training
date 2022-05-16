@@ -1,0 +1,160 @@
+<div data-section-id="{{ section.id }}" data-section-type="product" data-enable-history-state="true" itemscope itemtype="http://schema.org/Product">
+
+  {%- assign current_variant = product.selected_or_first_available_variant -%}
+  {%- assign featured_image = current_variant.featured_image | default: product.featured_image -%}
+
+  <meta itemprop="name" content="{{ product.title }}{% unless current_variant.title == 'Default Title' %} - {{ current_variant.title }}{% endunless %}">
+  <meta itemprop="url" content="{{ shop.url }}{{ current_variant.url }}">
+  <meta itemprop="brand" content="{{ product.vendor }}">
+  <meta itemprop="image" content="{{ featured_image | img_url: '600x600' }}">
+  <meta itemprop="description" content="{{ product.description | strip_html | escape }}">
+
+  <div class="container gallery product-standalone">
+    <div class="row gallery-body">
+      <div class="col s12 m4">
+        {% if product.featured_image.size > 0 %}
+          {%- assign image_dimensions = '450x450' -%}
+
+          <div class="gallery-cover gray">
+            <img
+              {% if product_responsive %} class="responsive-img" {% endif %}
+              src="{{ product.featured_image | product_img_url: image_dimensions }}"
+              alt="{{ product.title }}"
+              crossorigin="anonymous"
+              data-product-featured-image />
+          </div>
+        {% endif %}
+
+        <div class="checkout-column">
+          <form action="/cart/add" method="post" enctype="multipart/form-data">
+            <div class="price-quantity-wrapper">
+              <div class="price-wrapper" data-price-wrapper>
+                <label>price</label>
+                <span class="price" data-product-price>
+                  {{ current_variant.price | money }}
+                </span>
+
+                {% if product.compare_at_price_max > product.price %}
+                  <span class="visually-hidden" data-compare-text>{{ 'products.product.regular_price' | t }}</span>
+                  <s data-compare-price>
+                    {% if current_variant.compare_at_price > current_variant.price %}
+                      {{ current_variant.compare_at_price | money }}
+                    {% endif %}
+                  </s>
+                {% endif %}
+              </div>
+
+              <div class="input-field quantity-counter">
+                <label for="Quantity">quantity</label>
+                <i class="material-icons remove">remove_circle_outline</i>
+                <input type="number" id="Quantity" name="quantity" value="1" min="1">
+                <i class="material-icons add">add_circle_outline</i>
+              </div>
+            </div>
+
+            {% unless product.variants.size == 1 and product.options.size == 1 and product.options.first == 'Title' and product.variants.first.title == 'Default Title' %}
+              {% for option in product.options_with_values %}
+                <div class="selector-wrapper js">
+                  <label
+                    {% if option.name == 'default' %}class="label-hidden"{% endif %}
+                    for="SingleOptionSelector-{{ forloop.index0 }}">
+                      {{ option.name }}
+                  </label>
+
+                  <select
+                    id="SingleOptionSelector-{{ forloop.index0 }}"
+                    data-single-option-selector
+                    data-index="option{{ option.position }}">
+                    {% for value in option.values %}
+                      <option
+                        value="{{ value | escape }}"
+                        {% if option.selected_value == value %}selected="selected"{% endif %}>{{ value }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              {% endfor %}
+            {% endunless %}
+
+            <select name="id" class="no-js" data-product-select>
+              {% for variant in product.variants %}
+                <option
+                  {% if variant == current_variant %}selected="selected"{% endif %}
+                  {% unless variant.available %}disabled="disabled"{% endunless %}
+                  value="{{ variant.id }}">
+                    {{ variant.title }}
+                </option>
+              {% endfor %}
+            </select>
+
+
+            <button
+              class="btn-large z-depth-0"
+              type="submit"
+              name="add"
+              data-add-to-cart
+              {% unless current_variant.available %}disabled="disabled"{% endunless %}>
+                <span data-add-to-cart-text>
+                  {% if current_variant.available %}
+                    {{ 'products.product.add_to_cart' | t }}
+                  {% else %}
+                    {{ 'products.product.sold_out' | t }}
+                  {% endif %}
+                </span>
+            </button>
+
+            {% if product.tags.size > 0 %}
+              <div class="tags-wrapper">
+                <label>tags</label>
+                <div class="tags">
+                  {% for tag in product.tags %}
+                    <div class="chip">{{ tag | link_to_tag: tag }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+
+          </form>
+        </div>
+      </div>
+      <div class="col s12 m8">
+        <div class="title-wrapper">
+          <h3>{{ product.title }}</h3>
+          <p>{{ product.vendor }}</p>
+        </div>
+        <p class="description">{{ product.description }}</p>
+
+        {% if product.images.size > 1  %}
+          {% include 'product-image-carousel' %}
+        {% endif %}
+
+        {% if section.settings.show_share_buttons %}
+          {% include 'social-sharing', share_title: product.title, share_permalink: product.url, share_image: product %}
+        {% endif %}
+
+        <div id="shopify-product-reviews" data-id="{{product.id}}">{{ product.metafields.spr.reviews }}</div>
+      </div>
+    </div>
+  </div>
+
+
+  {% unless product.empty? %}
+    <script type="application/json" data-product-json>
+      {{ product | json }}
+    </script>
+  {% endunless %}
+</div>
+
+{% schema %}
+  {
+    "name": "Product pages",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_share_buttons",
+        "label": "Show social sharing buttons",
+        "default": true
+      }
+    ]
+  }
+{% endschema %}

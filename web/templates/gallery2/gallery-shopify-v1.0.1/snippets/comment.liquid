@@ -1,0 +1,8 @@
+<li id="{{ comment.id }}">
+  {% capture date %}{{ comment.created_at | time_tag: format: 'month_day_year' }}{% endcapture %}
+  <p class="author">{{ 'blogs.article.comment_meta_html' | t: author: comment.author, date: date }}</p>
+
+  <div class="comment">
+    {{ comment.content }}
+  </div>
+</li>

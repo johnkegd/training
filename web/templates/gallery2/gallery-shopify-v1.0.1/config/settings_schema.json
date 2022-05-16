@@ -1,0 +1,226 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Gallery",
+    "theme_version": "1.0.0",
+    "theme_author": "Materialize",
+    "theme_documentation_url": "https://github.com/Shopify/slate",
+    "theme_support_email": "theme-support@shopify.com"
+  },
+  {
+    "name": "Dark Theme",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "dark_theme",
+        "label": "Enable Dark Theme",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "Naming",
+    "settings": [
+      {
+        "type": "text",
+        "id": "shop_title",
+        "label": "Shop Title",
+        "default": "Gallery"
+      },
+      {
+        "type": "text",
+        "id": "homepage_title",
+        "label": "Homepage Title",
+        "default": "I make things"
+      },
+      {
+        "type": "text",
+        "id": "homepage_tagline",
+        "label": "Homepage Tagline",
+        "default": "Online Shop"
+      }
+    ]
+  },
+  {
+    "name": "Filter Bar",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "filter_type",
+        "label": "Disable filter by product type",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "filter_tag",
+        "label": "Disable filter by product tag",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "filter_variant",
+        "label": "Disable filter by product variant",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "header",
+        "content": "General colors"
+      },
+      {
+        "type": "color",
+        "id": "color_primary",
+        "label": "Primary color",
+        "default": "#ba68c8",
+        "info": "Used for text links, and primary buttons"
+      },
+      {
+        "type": "color",
+        "id": "color_secondary",
+        "label": "Secondary color",
+        "default": "#26a69a",
+        "info": "Used for text links, and primary buttons"
+      },
+      {
+        "type": "color",
+        "id": "color_body_text",
+        "label": "Text color",
+        "default": "#000",
+        "info": "Color used for content and paragraph text"
+      },
+      {
+        "type": "color",
+        "id": "footer_background_color",
+        "label": "Background color",
+        "default": "#e6e6e6",
+        "info": "Footer background color"
+      }
+    ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Social sharing options"
+      },
+      {
+        "type": "checkbox",
+        "id": "social_sharing_blog",
+        "label": "Enable sharing for blog articles",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "share_facebook",
+        "label": "Share on Facebook",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "share_twitter",
+        "label": "Tweet on Twitter",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "share_pinterest",
+        "label": "Pin on Pinterest",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Sharing links"
+      },
+      {
+        "type": "text",
+        "id": "social_twitter_link",
+        "label": "Twitter link",
+        "default": "http://twitter.com"
+      },
+      {
+        "type": "text",
+        "id": "social_facebook_link",
+        "label": "Facebook link"
+      },
+      {
+        "type": "text",
+        "id": "social_pinterest_link",
+        "label": "Pinterest link"
+      },
+      {
+        "type": "text",
+        "id": "social_instagram_link",
+        "label": "Instagram link"
+      },
+      {
+        "type": "text",
+        "id": "social_snapchat_link",
+        "label": "Snapchat link"
+      },
+      {
+        "type": "text",
+        "id": "social_tumblr_link",
+        "label": "Tumblr link"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube_link",
+        "label": "Youtube link"
+      },
+      {
+        "type": "text",
+        "id": "social_vimeo_link",
+        "label": "Vimeo link"
+      }
+    ]
+  },
+  {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "cart_notes_enable",
+        "label": "Enable cart notes",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Collection",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "collection_full_header",
+        "label": "Fullscreen header",
+        "default": false
+      }
+    ]
+  },
+  {
+    "name": "Favicon",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon image",
+        "info": "Will be scaled down to 32 x 32px"
+      }
+    ]
+  },
+  {
+    "name": "Reviews",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "shopify_product_reviews_enabled",
+        "label": "Shopify Product Reviews Enabled",
+        "info": "Enable if you have installed the Shopify Product Reviews App"
+      }
+    ]
+  }
+]

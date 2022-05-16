@@ -1,0 +1,111 @@
+{% assign collection_col = "m6" %}
+{% if settings.dark_theme %}
+  {% assign collection_col = "m6 l4" %}
+{% endif %}
+
+<div class="featured-collection-wrapper {% if settings.dark_theme == false %} container {% endif %}">
+  <div class="{% if settings.dark_theme %} container {% endif %}">
+    {% if section.settings.title != blank %}
+      <h2 class="collection-title">{{ section.settings.title | escape }}</h2>
+    {% endif %}
+
+    {% if section.settings.description != blank %}
+      <div class="rte">
+        <span>{{ section.settings.description | escape }}</span>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="gallery gallery-masonry row">
+    {% for block in section.blocks limit: section.blocks.size %}
+      <div class="col s12 {{collection_col}} gallery-item gallery-filter" {{ block.shopify_attributes }}>
+        {%- assign collection = collections[block.settings.collection] -%}
+        <div class="collection-item">
+          <a class="gallery-cover" href="{% if collection.empty? %}#{% else %}{{ collection.url }}{% endif %}">
+            {% if collection.image != blank %}
+              {{ collection | img_url: '480x480' | img_tag: collection.title }}
+            {% elsif collection.products.first != blank %}
+              {{ collection.products.first | img_url: '480x480' | img_tag: collection.title }}
+            {% elsif collection.empty? %}
+              {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+              {{ 'collection-' | append: current | placeholder_svg_tag: 'placeholder-svg placeholder-svg--small' }}
+            {% endif %}
+          </a>
+
+          {% if settings.dark_theme %}
+            <a class="gallery-overlay" href="{{ collection.url }}" title="{{ 'collections.general.link_title' | t: title: title }}">
+              <span class="overlay-header">
+                <span class="overlay-title">{{ collection.title }}</span>
+              </span>
+            </a>
+            <div class="gallery-header invisible"></div>
+          {% else %}
+            <a class="gallery-header" href="{% if collection.empty? %}#{% else %}{{ collection.url }}{% endif %}">
+              <span class="title">
+                {% if collection.empty? %}
+                  {{ 'homepage.onboarding.collection_title' | t }}
+                {% else %}
+                  {{ collection.title }}
+                {% endif %}
+              </span>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% if section.blocks.size == 0 %}
+  {% include 'no-blocks' %}
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Collection list",
+    "max_blocks": 12,
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Collection list"
+      },
+      {
+         "type": "textarea",
+         "id": "description",
+         "label": "Description"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "collection",
+        "name": "Collection",
+        "settings": [
+          {
+            "label": "Collection",
+            "id": "collection",
+            "type": "collection"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Collection list",
+        "category": "Collection",
+        "blocks": [
+          {
+            "type": "collection"
+          },
+          {
+            "type": "collection"
+          },
+          {
+            "type": "collection"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

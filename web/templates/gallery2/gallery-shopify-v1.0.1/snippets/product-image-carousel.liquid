@@ -1,0 +1,11 @@
+<div class="carousel-wrapper">
+  <div class="carousel">
+
+    {% for image in product.images offset:1 %}
+      <a class="carousel-item" href="#!">
+        <img src="{{ image.src | product_img_url: 'medium' }}">
+      </a>
+
+    {% endfor %}
+  </div>
+</div>

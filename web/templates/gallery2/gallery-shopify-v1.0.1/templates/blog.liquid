@@ -1,0 +1,81 @@
+
+{% if blog.all_tags.size > 0 %}
+  <nav
+    class="filter-navbar {% if settings.dark_theme %} z-depth-0 {% endif %}"
+    style="height: 48px; {% if settings.dark_theme %} margin-top: -48px; background: transparent; {% endif %}">
+    <div class="categories-wrapper">
+      <div class="categories-container">
+        <ul class="categories container" data-filter="type">
+          <li class="{% unless current_tags %} active {% endunless %}"><a href="{{blog.url}}">All</a></li>
+          {% for tag in blog.all_tags %}
+            {% if current_tags contains tag %}
+              <li class="active"><a href="#">{{tag}}</a></li>
+            {% else %}
+              <li>{{ tag | link_to_tag: tag }}</li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+{% endif %}
+
+{% paginate blog.articles by 5 %}
+
+  {%- assign blog_title = blog.title -%}
+
+  {% if current_tags %}
+    {% capture blog_title %}{{ blog.title | link_to: blog.url }} &mdash; {{ current_tags.first }}{% endcapture %}
+  {% endif %}
+
+
+  {% comment %}
+
+  Article Previews
+  ====================
+  {% endcomment %}
+
+    {% for article in blog.articles %}
+      {% assign for_even = forloop.index0 | modulo:2 %}
+      <div class="
+          article-wrapper
+          {% if settings.dark_theme == false %} container {% endif %}
+          {% if for_even == 1 %} right-aligned {% endif %}">
+        <div class="gallery row">
+          <div class="col s12 m4 l6">
+            <div class="product-description">
+              <h2>{{ article.title | default: onboarding_title }}</h2>
+
+              {% capture date %}{{ article.published_at | time_tag: format: 'month_day_year' }}{% endcapture %}
+
+              <p class="blog-author">
+                {{ 'blogs.article.author_on_date_html' | t: author: article.author, date: date }}
+              </p>
+
+              <div class="rte">
+              {% if article.excerpt.size > 0 %}
+                {{ article.excerpt }}
+              {% else %}
+                <p>
+                  {{ article.content | strip_html | truncatewords: 50 }}
+                </p>
+              {% endif %}
+            </div>
+            </div>
+          </div>
+
+          {% assign article_col = "m8 l6" %}
+          {% assign article_fillscreen = true %}
+          {% assign article_responsive = true %}
+          {% include 'article-expand' %}
+        </div>
+      </div>
+
+    {% endfor %}
+  </div>
+
+  {% if paginate.pages > 1 %}
+    {% include 'pagination' %}
+  {% endif %}
+
+{% endpaginate %}

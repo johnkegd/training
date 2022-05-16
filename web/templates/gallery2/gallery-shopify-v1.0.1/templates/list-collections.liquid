@@ -1,0 +1,56 @@
+{% comment %}
+  This page represents the /collections and /products pages.
+{% endcomment %}
+
+{% assign collection_col = "m6" %}
+{% if settings.dark_theme %}
+  {% assign collection_col = "m6 l4" %}
+{% endif %}
+
+<div class="featured-collection-wrapper {% if settings.dark_theme == false %} container {% endif %}">
+  {% if settings.dark_theme == false %}
+    <div class="container">
+      <h1>{{ page_title }}</h1>
+    </div>
+  {% endif %}
+
+  <div class="gallery gallery-masonry row">
+    {% for collection in collections %}
+      {% unless collection.handle == 'frontpage' %}
+        <div class="col s12 {{collection_col}} gallery-item gallery-filter">
+          <div class="collection-item">
+            <a class="gallery-cover" href="{{ collection.url }}" title="{{ 'collections.general.link_title' | t: title: title }}">
+              {% if collection.image != blank %}
+                {{ collection | img_url: '480x480' | img_tag: collection.title }}
+              {% elsif collection.products.first != blank %}
+                {{ collection.products.first | img_url: '480x480' | img_tag: collection.title }}
+              {% else %}
+                {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+                {{ 'collection-' | append: current | placeholder_svg_tag: 'placeholder-svg placeholder-svg--small' }}
+              {% endif %}
+            </a>
+
+            {% if settings.dark_theme %}
+              <a class="gallery-overlay" href="{{ collection.url }}" title="{{ 'collections.general.link_title' | t: title: title }}">
+                <span class="overlay-header">
+                  <span class="overlay-title">{{ collection.title }}</span>
+                </span>
+              </a>
+              <div class="gallery-header invisible"></div>
+            {% else %}
+              <a class="gallery-header" href="{{ collection.url }}" title="{{ 'collections.general.link_title' | t: title: title }}">
+                <span class="title">
+                  {% if collection.empty? %}
+                    {{ 'homepage.onboarding.collection_title' | t }}
+                  {% else %}
+                    {{ collection.title }}
+                  {% endif %}
+                </span>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      {% endunless %}
+    {% endfor %}
+  </div>
+</div>
